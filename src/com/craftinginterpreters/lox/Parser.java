@@ -63,7 +63,54 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    /*
+    express -> assignment;
+    assignment  -> IDENTIFIER "=" assignment | equality ;
+    The tricky part here is to know that we are parsing an assignment.
+    The left-hand side of an assignment isn't an expression that evaluates to a value.
+    We need to figure out what variable on the left (l-value) refers to, so we know where to store
+    the right-hand side expression's value (r-value).
+    l-value = r-value;
+
+    An l-value "evaluates" to a storage location.
+    We want the syntax tree to reflect that an l-value isn't evaluated like a normal expression.
+    That's why Expr.Assign has a Token for the l-value.
+    The problem is that the parser doesn't know it's parsing an l-value until it hits the "=".
+
+    assignment is right-associative (a = b = c -> a = (b = c))
+
+    The trick is that right before we create the assignment expression node,
+    we look at the left-hand side expression and figure out what kind of assignment target it is.
+    We convert the r-value expression node into an l-value representation.
+
+    The left-hand side of an assignment could also work as a valid expression.
+    This means that we can parse the left-hand side as if it were an expression (r-value)
+    and then produce a syntax tree that turns it into an assignment target (l-value).
+
+    If the left-hand side expression isn't a valid assignment target, we fail with a syntax
+    error. (ex: of failure: a + b = c).
+
+     */
+    private Expr assignment() {
+
+        Expr expr = equality();
+
+        if (match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
+
     }
 
 
