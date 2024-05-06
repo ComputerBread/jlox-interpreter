@@ -134,10 +134,15 @@ public class Parser {
     If the left-hand side expression isn't a valid assignment target, we fail with a syntax
     error. (ex: of failure: a + b = c).
 
+    -- UPDATE
+    assignment  -> IDENTIFIER "=" assignment | logic_or ;
+    logic_or    -> logic_and ( "or" logic_and )* ;
+    logic_and   -> equality ( "and" equality )* ;
+
      */
     private Expr assignment() {
 
-        Expr expr = equality();
+        Expr expr = or();
 
         if (match(EQUAL)) {
             Token equals = previous();
@@ -152,6 +157,27 @@ public class Parser {
         }
         return expr;
 
+    }
+
+    private Expr or() {
+        Expr expr = and();
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr and() {
+        Expr expr = equality();
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+        return expr;
     }
 
 

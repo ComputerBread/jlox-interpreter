@@ -26,6 +26,12 @@ public class AstPrinter implements Expr.Visitor<String> {
         if (expr.value == null) return "nil";
         return expr.value.toString();
     }
+
+    @Override
+    public String visitLogicalExpr(Expr.Logical expr) {
+        return "TODO";
+    }
+
     @Override
     public String visitUnaryExpr(Expr.Unary expr) {
         return parenthesize(expr.operator.lexeme, expr.right);
