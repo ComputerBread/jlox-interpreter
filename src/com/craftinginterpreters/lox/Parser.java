@@ -333,8 +333,50 @@ public class Parser {
             Token operator = previous();
             return new Expr.Unary(operator, unary());
         }
-        return primary();
+        return call();
     }
+
+    /*
+    call        -> primary ( "(" arguments? ")" )* ;
+    arguments   -> expression ( "," expression )*;
+
+    We need to be careful of function call returning a function that we call:
+    getCallBack()();
+     */
+    private Expr call() {
+        Expr expr = primary();
+
+        while (true) {
+            // do this to be able to do this: funcWithCallBacks()()();
+            if (match(LEFT_PAREN)) {
+                expr = finishCall(expr);
+            } else {
+                break;
+            }
+        }
+        return expr;
+    }
+
+    private Expr finishCall(Expr callee) {
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                // this is "a soft error", it's mainly to be consistent with clox
+                if (arguments.size() >= 255) {
+                    // not throwing the error, because throwing = parser in confused state => panic mode
+                    // here the parser isn't confused! so we just report the error
+                    error(peek(), "Can't have more than 255 arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+
+        Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Expr.Call(callee, paren, arguments);
+    }
+
+
 
     private Expr primary() {
        if (match(FALSE))  return new Expr.Literal(false);
