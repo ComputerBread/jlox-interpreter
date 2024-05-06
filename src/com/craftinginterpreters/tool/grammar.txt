@@ -1,7 +1,8 @@
 program     -> declaration* EOF ;
 declaration -> varDecl | statement ;
-statement   -> exprStmt | ifStmt | printStmt | whileStmt | block;
+statement   -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block;
 exprStmt    -> expression ";" ;
+forStmt     -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement;
 ifStmt      -> "if" "(" expression ")" statement ( "else" statement )? ;
 printStmt   -> "print" expression ";" ;
 whileStmt   -> "while" "(" expression ")" statement ;
@@ -15,5 +16,7 @@ equality    -> comparison (( "!=" | "==") comparison)* ;
 comparison  -> term (("<" | ">" | "<=" | ">=") term)* ;
 term        -> factor (("-" | "+") factor)*;
 factor      -> unary (("/" | "*") unary)*;
-unary       -> ("!" | "-") unary | primary;
+unary       -> ("!" | "-") unary | call;
+call        -> primary ( "(" arguments? ")" )* ;
+arguments   -> expression ( "," expression )*;
 primary     -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER;
