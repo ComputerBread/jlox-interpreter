@@ -30,6 +30,8 @@ public class GenerateAst {
                 "Function   : Token name, List<Token> params, List<Stmt> body",
                 "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
                 "Print      : Expr expression",
+                // keep return keyword token, to know its location for error reporting
+                "Return     : Token keyword, Expr value",
                 "Var        : Token name, Expr initializer",
                 "While      : Expr condition, Stmt body",
                 "Block      : List<Stmt> statements"
