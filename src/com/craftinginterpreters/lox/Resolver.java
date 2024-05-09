@@ -175,9 +175,16 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         currentFunction = enclosingFunction;
     }
 
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        declare(stmt.name);
+        define(stmt.name);
+        return null;
+    }
 
     // ------------- we handle every place where a var is declared, read or written
     // we also need to visit methods for all other syntax tree nodes in order to recurse into their subtrees
+
 
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
