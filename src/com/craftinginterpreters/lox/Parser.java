@@ -261,6 +261,15 @@ public class Parser {
     logic_or    -> logic_and ( "or" logic_and )* ;
     logic_and   -> equality ( "and" equality )* ;
 
+    -- UPDATE
+    we can't easily tell that a series of tokens is the left-hand side of an assignment
+    until we reach the "=". The trick we do is to parse the left hand side as a normal expression.
+    Then when we stumble onto the "=" sign after it, we take the expression we parsed and transform it
+    into the correct syntax tree node for the assignment.
+
+    assignment  -> (call ".")? IDENTIFIER "=" assignment | logic_or ;
+
+
      */
     private Expr assignment() {
 
@@ -273,6 +282,9 @@ public class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable)expr).name;
                 return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get) {
+                Expr.Get get = (Expr.Get) expr;
+                return new Expr.Set(get.object, get.name, value);
             }
 
             error(equals, "Invalid assignment target.");
@@ -403,6 +415,9 @@ public class Parser {
             // do this to be able to do this: funcWithCallBacks()()();
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }

@@ -3,6 +3,7 @@ package com.craftinginterpreters.lox;
 import java.util.List;
 
 public class LoxClass implements LoxCallable {
+
     final String name;
 
     LoxClass(String name) {
@@ -24,4 +25,5 @@ public class LoxClass implements LoxCallable {
         LoxInstance instance = new LoxInstance(this);
         return instance;
     }
+
 }

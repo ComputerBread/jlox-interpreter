@@ -19,9 +19,11 @@ public class GenerateAst {
                 // we store the closing parenthesis, to be able to use the token's location when there's a runtime error
                 "Call   : Expr callee, Token paren, List<Expr> arguments",
 
+                "Get    : Expr object, Token name",
                 "Grouping : Expr expression",
                 "Literal : Object value",
                 "Logical : Expr left, Token operator, Expr right",
+                "Set     : Expr object, Token name, Expr value",
                 "Unary : Token operator, Expr right",
                 "Variable : Token name"
         ));
