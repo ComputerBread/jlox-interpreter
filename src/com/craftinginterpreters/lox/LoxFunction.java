@@ -40,4 +40,16 @@ public class LoxFunction implements LoxCallable {
     public String toString() {
         return "<fn " + declaration.name.lexeme + ">";
     }
+
+    /*
+    Create a new environment nestled inside the method's original closure.
+    When we declare a class, its methods have the class scope as their environment (closure).
+    When a method is used, we create a new environment
+    that binds "this" to the instance that was before it.
+     */
+    LoxFunction bind(LoxInstance instance) {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        return new LoxFunction(declaration, environment);
+    }
 }
